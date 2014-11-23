@@ -9,6 +9,8 @@
 -export([gettext/1, pgettext/2, dgettext/2, dpgettext/3]).
 -export([ngettext/3, npgettext/4, dngettext/4, dnpgettext/5]).
 
+-export([gettext/2, pgettext/3, dgettext/3, dpgettext/4]).
+-export([ngettext/4, npgettext/5, dngettext/5, dnpgettext/6]).
 -export([bindtextdomain/2]).
 -export([setlocale/2, getlocale/1]).
 -export([textdomain/0, textdomain/1]).
@@ -27,6 +29,26 @@ dngettext(Domain, Singular, Plural, N) -> dnpgettext(Domain, undefined, Singular
 -spec dpgettext(atom(), string() | undefined, string()) -> string().
 dpgettext(Domain, Context, Msgid) ->
     Locale = getlocale(lc_messages),
+    dpgettext(Domain, Context, Msgid, Locale).
+
+-spec dnpgettext(atom(), string() | undefined, string(), string(), integer()) -> string().
+dnpgettext(Domain, Context, Singular, Plural, N) ->
+    Locale = getlocale(lc_messages),
+    dnpgettext(Domain, Context, Singular, Plural, N, Locale).
+
+
+
+
+gettext(Msgid, Locale) -> dpgettext(undefined, undefined, Msgid, Locale).
+ngettext(Singular, Plural, N, Locale) -> dnpgettext(undefined, undefined, Singular, Plural, N, Locale).
+pgettext(Context, Msgid, Locale) -> dpgettext(undefined, Context, Msgid, Locale).
+npgettext(Context, Singular, Plural, N, Locale) -> dnpgettext(undefined, Context, Singular, Plural, N, Locale).
+
+dgettext(Domain, Msgid, Locale) -> dpgettext(Domain, undefined, Msgid, Locale).
+dngettext(Domain, Singular, Plural, N, Locale) -> dnpgettext(Domain, undefined, Singular, Plural, N, Locale).
+
+-spec dpgettext(atom(), string() | undefined, string(), string()) -> string().
+dpgettext(Domain, Context, Msgid, Locale) ->
     Domain1 = if Domain == undefined -> textdomain();
                  true -> Domain
               end,
@@ -35,9 +57,8 @@ dpgettext(Domain, Context, Msgid) ->
         Msgstr -> Msgstr
     end.
 
--spec dnpgettext(atom(), string() | undefined, string(), string(), integer()) -> string().
-dnpgettext(Domain, Context, Singular, Plural, N) ->
-    Locale = getlocale(lc_messages),
+-spec dnpgettext(atom(), string() | undefined, string(), string(), integer(), string()) -> string().
+dnpgettext(Domain, Context, Singular, Plural, N, Locale) ->
     Domain1 = if Domain == undefined -> textdomain();
                   true -> Domain
               end,
@@ -46,8 +67,6 @@ dnpgettext(Domain, Context, Singular, Plural, N) ->
         undefined -> Plural;
         Msgstr -> Msgstr
     end.
-
-%% TODO: add `*gettext(..., Locale)' functions here (locale from args, not PD).
 
 %% Configuration APIs
 -spec bindtextdomain(atom(), file:filename()) -> ok.
